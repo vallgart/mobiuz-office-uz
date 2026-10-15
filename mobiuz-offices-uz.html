@@ -1,0 +1,1105 @@
+<!--
+  Mobiuz — «Ofislar»: yangilangan sahifa (o‘zbek tili, uz)
+  To‘rt blok: 1) USLUBLAR  2) HTML  3) OFISLAR MA’LUMOTLARI (JSON, qo‘lda tahrirlanadi)  4) SKRIPT. Hammasi #mbz-offices ichida ajratilgan,
+  shuning uchun Bitrix’ga (HTML-blok / komponent shabloni) sayt uslublari bilan to‘qnashuvsiz joylashtirish mumkin.
+-->
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<!-- MUHIM: bu satr bo‘lmasa, telefonlar sahifani ~980px kenglikda chizadi va mobil ko‘rinish yoqilmaydi.
+     mobi.uz saytining o‘zida u shablonda bo‘lishi mumkin; Bitrix’ga qo‘yishda faqat quyidagi 1–4 bloklarni oling. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobiuz ofislari</title>
+
+<!-- ============================ 1. USLUBLAR ============================ -->
+<!-- Fira Sans shrifti (lotin + kirill). Saytda u allaqachon ulangan bo‘lsa, bu satrlarni olib tashlash mumkin -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap">
+<style>
+#mbz-offices{
+  --mbz-red:#e2231a; --mbz-red-d:#c41b13; --mbz-red-soft:#fdecea;
+  --mbz-ink:#1c2230; --mbz-muted:#6b7280; --mbz-line:#e7e9ee; --mbz-bg:#f6f7f9;
+  --mbz-green:#138a4b; --mbz-green-bg:#e6f6ed;
+  --mbz-amber:#a35f00; --mbz-amber-bg:#fff3dc;
+  --mbz-closed:#b42318; --mbz-closed-bg:#fdecea;
+  font-family:'Fira Sans',-apple-system,'Segoe UI',Roboto,Arial,sans-serif; color:var(--mbz-ink); line-height:1.45;
+  max-width:1200px; margin:0 auto; padding:8px 12px 40px; box-sizing:border-box;
+  /* Moslashuvchanlik oyna emas, blokning o‘z kengligi bo‘yicha hisoblanadi: tor/qattiq ustun ichida ham ishlaydi */
+  container-type:inline-size; container-name:mbz;
+}
+#mbz-offices *,#mbz-offices *::before,#mbz-offices *::after{box-sizing:border-box}
+#mbz-offices button{font:inherit;cursor:pointer}
+#mbz-offices svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* sarlavha */
+#mbz-offices .mbz__head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+#mbz-offices .mbz__title{margin:0 0 6px;font-size:28px;line-height:1.2;font-weight:700}
+#mbz-offices .mbz__lead{margin:0;color:var(--mbz-muted);max-width:720px}
+
+/* filtrlar paneli */
+#mbz-offices .mbz__bar{position:relative;background:#fff;border:1px solid var(--mbz-line);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(20,28,45,.06);margin-bottom:14px}
+#mbz-offices .mbz__row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#mbz-offices .mbz__search{position:relative;flex:1 1 320px;min-width:220px}
+#mbz-offices .mbz__search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mbz-muted);pointer-events:none}
+#mbz-offices .mbz__search input{width:100%;height:46px;padding:0 42px 0 44px;border:1px solid var(--mbz-line);border-radius:12px;background:var(--mbz-bg);font:inherit;color:inherit;outline:none;transition:.15s}
+#mbz-offices .mbz__search input:focus{border-color:var(--mbz-red);background:#fff;box-shadow:0 0 0 3px rgba(226,35,26,.12)}
+#mbz-offices .mbz__clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:var(--mbz-muted);display:none;align-items:center;justify-content:center}
+#mbz-offices .mbz__clear:hover{background:var(--mbz-line)}
+#mbz-offices .mbz__clear.is-on{display:flex}
+#mbz-offices .mbz__clear svg{position:static;transform:none;width:16px;height:16px}
+
+
+#mbz-offices .mbz__sel{flex:0 0 280px;min-width:170px;max-width:100%;height:46px;padding:0 38px 0 14px;border:1px solid var(--mbz-line);border-radius:12px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%236b7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 14px center;-webkit-appearance:none;appearance:none;font:inherit;color:inherit;cursor:pointer;outline:none;transition:.15s;text-overflow:ellipsis}
+#mbz-offices .mbz__sel:hover{border-color:#cfd3db}
+#mbz-offices .mbz__sel:focus{border-color:var(--mbz-red);box-shadow:0 0 0 3px rgba(226,35,26,.12)}
+#mbz-offices .mbz__tgl{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 14px;border:1px solid var(--mbz-line);border-radius:12px;background:#fff;color:var(--mbz-ink);transition:.15s}
+#mbz-offices .mbz__tgl i{width:30px;height:18px;border-radius:99px;background:#cfd3db;position:relative;transition:.15s}
+#mbz-offices .mbz__tgl i::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+#mbz-offices .mbz__tgl[aria-pressed="true"]{border-color:var(--mbz-red);background:var(--mbz-red-soft)}
+#mbz-offices .mbz__tgl[aria-pressed="true"] i{background:var(--mbz-red)}
+#mbz-offices .mbz__tgl[aria-pressed="true"] i::after{left:14px}
+
+
+#mbz-offices .mbz__meta{display:flex;justify-content:space-between;align-items:center;margin:6px 2px 14px;color:var(--mbz-muted);font-size:14px}
+#mbz-offices .mbz__reset{border:0;background:none;color:var(--mbz-red);padding:4px 0;font-weight:600}
+#mbz-offices .mbz__reset[hidden]{display:none}
+
+/* kartochkalar */
+#mbz-offices .mbz__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:16px}
+#mbz-offices .mbz-group{margin:0 0 34px}
+#mbz-offices .mbz-group:last-child{margin-bottom:0}
+#mbz-offices .mbz-group__t{margin:0 0 14px;padding:0;font-size:24px;line-height:1.25;font-weight:700;color:var(--mbz-ink);display:flex;align-items:baseline;gap:10px}
+#mbz-offices .mbz-group__t small{font-size:14px;font-weight:500;color:var(--mbz-muted)}
+#mbz-offices .mbz-card{display:flex;flex-direction:column;gap:12px;padding:18px;background:#fff;border:1px solid var(--mbz-line);border-radius:18px;transition:box-shadow .2s,transform .2s,border-color .2s}
+#mbz-offices .mbz-card:hover{box-shadow:0 10px 28px rgba(20,28,45,.10);transform:translateY(-2px);border-color:#d9dce4}
+#mbz-offices .mbz-card__name{margin:0;font-size:18px;line-height:1.25;font-weight:700}
+#mbz-offices .mbz-line{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+#mbz-offices .mbz-line svg{margin-top:2px;color:var(--mbz-muted)}
+#mbz-offices .mbz-line em{display:block;font-style:normal;color:var(--mbz-muted);font-size:13px;margin-top:2px}
+#mbz-offices .mbz-line b{font-weight:600}
+#mbz-offices .mbz-line em.mbz-st{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:13px;font-weight:600;color:var(--mbz-closed)}
+#mbz-offices .mbz-st::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:currentColor}
+#mbz-offices .mbz-st--open{color:var(--mbz-green)!important}
+#mbz-offices .mbz-st--lunch{color:var(--mbz-amber)!important}
+#mbz-offices .mbz-st--closed{color:var(--mbz-closed)!important}
+
+#mbz-offices .mbz-code{color:var(--mbz-muted);white-space:nowrap}
+#mbz-offices .mbz-code b{color:var(--mbz-ink);font-weight:600;letter-spacing:.02em;user-select:all}
+#mbz-offices .mbz-sched{border-top:1px dashed var(--mbz-line);padding-top:10px}
+#mbz-offices .mbz-sched__t{color:var(--mbz-muted);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+#mbz-offices .mbz-sched ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:14px}
+#mbz-offices .mbz-sched li{display:flex;justify-content:space-between;gap:12px;padding:6px 10px;border-radius:8px}
+#mbz-offices .mbz-sched li span:first-child{color:var(--mbz-muted)}
+#mbz-offices .mbz-sched li.is-today{background:var(--mbz-bg);font-weight:600}
+#mbz-offices .mbz-sched li.is-today span:first-child{color:var(--mbz-ink)}
+#mbz-offices .mbz-sched li span:last-child{text-align:right}
+#mbz-offices .mbz-sched .mbz-h{color:var(--mbz-green);font-weight:600}
+#mbz-offices .mbz-sched .mbz-l{color:var(--mbz-muted);font-style:normal;font-weight:400;font-size:13px}
+
+#mbz-offices .mbz-actions{display:flex;gap:8px;margin-top:auto;padding-top:4px}
+#mbz-offices .mbz-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:42px;padding:0 12px;border-radius:11px;border:1px solid var(--mbz-line);background:#fff;color:var(--mbz-ink);text-decoration:none;font-size:14px;font-weight:600;transition:.15s}
+#mbz-offices .mbz-btn:hover{border-color:var(--mbz-red);color:var(--mbz-red)}
+#mbz-offices .mbz-btn--main{background:var(--mbz-red);border-color:var(--mbz-red);color:#fff}
+#mbz-offices .mbz-btn--main:hover{background:var(--mbz-red-d);border-color:var(--mbz-red-d);color:#fff}
+
+#mbz-offices .mbz__error{padding:16px 18px;margin-bottom:14px;border:1px solid #f3b8b3;border-radius:14px;background:var(--mbz-red-soft);color:var(--mbz-closed);font-size:14px;line-height:1.5}
+#mbz-offices .mbz__error code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+#mbz-offices .mbz-card--closed{background:#fcfcfd;border-color:#f0cfcc}
+#mbz-offices .mbz-closed{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--mbz-closed-bg);color:var(--mbz-closed)}
+#mbz-offices .mbz-closed--date{background:var(--mbz-amber-bg);color:var(--mbz-amber)}
+#mbz-offices .mbz-closed svg{margin-top:1px;width:20px;height:20px}
+#mbz-offices .mbz-closed b{display:block;font-size:15px;font-weight:700;line-height:1.3}
+#mbz-offices .mbz-closed span{display:block;margin-top:3px;font-size:14px;font-weight:600}
+#mbz-offices .mbz-closed span.mbz-closed__n{font-weight:400;color:var(--mbz-ink);opacity:.8;font-size:13.5px}
+#mbz-offices .mbz-card--closed .mbz-sched ul{opacity:.65}
+#mbz-offices .mbz-card--closed .mbz-sched .mbz-h{color:var(--mbz-muted)}
+#mbz-offices .mbz__empty{text-align:center;padding:56px 16px;border:1px dashed var(--mbz-line);border-radius:18px;background:var(--mbz-bg)}
+#mbz-offices .mbz__empty h3{margin:0 0 6px;font-size:18px}
+#mbz-offices .mbz__empty p{margin:0 0 16px;color:var(--mbz-muted)}
+#mbz-offices .mbz__empty button{border:0;background:var(--mbz-red);color:#fff;padding:11px 20px;border-radius:11px;font-weight:600}
+#mbz-offices .mbz__empty[hidden]{display:none}
+
+/* Planshetlar (~900px gacha): qidiruv butun qatorga, filtrlar paneli tepaga yopishmaydi */
+@container mbz (max-width:900px){
+  #mbz-offices .mbz__bar{position:static}
+  #mbz-offices .mbz__search{flex:1 1 100%}
+  #mbz-offices .mbz__title{font-size:25px}
+}
+/* Telefonlar (~720px gacha) */
+@container mbz (max-width:720px){
+  #mbz-offices .mbz__title{font-size:22px}
+  #mbz-offices .mbz-group__t{font-size:20px}
+  #mbz-offices .mbz__lead{font-size:14px}
+  #mbz-offices .mbz__bar{padding:12px;border-radius:14px}
+  #mbz-offices .mbz__row>*{flex:1 1 100%;min-width:0}
+  #mbz-offices .mbz__tgl{justify-content:space-between}
+  #mbz-offices .mbz__grid{grid-template-columns:1fr;gap:12px}
+  #mbz-offices .mbz-card{padding:16px;border-radius:16px}
+  #mbz-offices .mbz-card__name{font-size:17px}
+}
+/* Container queries qo‘llab-quvvatlanmaydigan brauzerlar uchun zaxira variant — oyna kengligi bo‘yicha */
+@supports not (container-type:inline-size){
+  @media (max-width:900px){
+    #mbz-offices .mbz__bar{position:static}
+    #mbz-offices .mbz__search{flex:1 1 100%}
+  }
+  @media (max-width:720px){
+    #mbz-offices .mbz__title{font-size:22px}
+    #mbz-offices .mbz__row>*{flex:1 1 100%;min-width:0}
+    #mbz-offices .mbz__tgl{justify-content:space-between}
+    #mbz-offices .mbz__grid{grid-template-columns:1fr}
+  }
+}
+@media print{
+  #mbz-offices .mbz__bar,#mbz-offices .mbz-actions,#mbz-offices .mbz__reset,#mbz-offices .mbz-st{display:none!important}
+  #mbz-offices .mbz__grid{grid-template-columns:1fr 1fr;gap:10px}
+  #mbz-offices .mbz-card{break-inside:avoid;box-shadow:none!important;transform:none!important;padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ 2. HTML ============================ -->
+<section class="mbz" id="mbz-offices" aria-labelledby="mbz-title">
+  <div class="mbz__head">
+    <div>
+      <h2 class="mbz__title" id="mbz-title">Mobiuz ofislari va xizmat ko‘rsatish markazlari</h2>
+      <p class="mbz__lead">Tarmoqqa ulanish, tarifni tanlash va shartnoma rasmiylashtirish, xizmatlar, hisob-kitoblar va hisob tafsilotlari bo‘yicha maslahatlar.</p>
+    </div>
+  </div>
+
+  <div class="mbz__bar">
+    <div class="mbz__row">
+      <label class="mbz__search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="mbz-q" placeholder="Manzil, tuman, mo‘ljal" autocomplete="off" aria-label="Ofisni qidirish">
+        <button class="mbz__clear" type="button" id="mbz-clear" aria-label="Qidiruvni tozalash"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </label>
+      <select class="mbz__sel" id="mbz-region" aria-label="Viloyat"></select>
+      <button class="mbz__tgl" type="button" id="mbz-open" aria-pressed="false">Hozir ochiq <i></i></button>
+      <button class="mbz__tgl" type="button" id="mbz-sun" aria-pressed="false">Yakshanba kuni ishlaydi <i></i></button>
+    </div>
+  </div>
+
+  <div class="mbz__meta">
+    <span id="mbz-count" aria-live="polite"></span>
+    <button class="mbz__reset" type="button" id="mbz-reset" hidden>Filtrlarni tozalash</button>
+  </div>
+
+  <div class="mbz__grid" id="mbz-list"></div>
+
+  <div class="mbz__empty" id="mbz-empty" hidden>
+    <h3>Hech narsa topilmadi</h3>
+    <p>So‘rovni o‘zgartirib ko‘ring yoki ba’zi filtrlarni olib tashlang.</p>
+    <button type="button" id="mbz-reset2">Filtrlarni tozalash</button>
+  </div>
+
+</section>
+
+<!-- ============================ 3. OFISLAR MA’LUMOTLARI (shu yerda tahrirlang) ============================
+  Har bir ofis — bitta { … } bloki. Qo‘shtirnoq ichidagi hamma narsani o‘zgartirish mumkin. Batafsil eslatma — quyida.
+
+  Maydonlar:
+    active    true — ko‘rsatish, false — ofisni yashirish (o‘chirish shart emas)
+    name      kartochka nomi
+    region    viloyat (viloyatning barcha ofislarida bir xil yoziladi; Toshkent uchun — «Toshkent»). Sahifada viloyatlar tartibi avtomatik: Toshkent, Toshkent viloyati, qolganlari alifbo bo‘yicha
+    address   manzil
+    landmark  mo‘ljal (majburiy emas, "" bo‘lishi mumkin)
+    uzkad     UzKad kodi ("" — kartochkada satr ko‘rsatilmaydi)
+    map       «Lokatsiya» tugmasi uchun (yangi oynada ochiladi): ofisning Yandeks Xaritalardagi havolasi https://…;
+              bo‘sh "" bo‘lsa — Yandeks Xaritalarda «viloyat + manzil» bo‘yicha qidiruv ochiladi;
+              o‘zingizning qidiruv matnini yozish yoki tayyor https://… havolani qo‘yish mumkin
+    schedule  ish tartibi — { "days", "hours", "lunch" } qatorlari ro‘yxati:
+                days   "du-ya", "du-ju", "sh", "ya" yoki sanab o‘tish "du,ch,ju"
+                       (du — dushanba, se — seshanba, ch — chorshanba, pa — payshanba, ju — juma, sh — shanba, ya — yakshanba)
+                hours  "09:00-18:00" yoki "dam olish"
+                lunch  tanaffus "13:00-14:00" yoki "" (yo‘q)
+              Ko‘rsatilmagan kunlar dam olish kuni hisoblanadi. Sutka davomida/yarim tungacha: "10:00-24:00".
+    closed    VAQTINCHA YOPILISH (majburiy bo‘lmagan maydon; bo‘lmasa — ofis odatdagidek ishlaydi). Ofisga quyidagi qatorni qo‘shing:
+                "closed": { "reopen": "15.11.2026", "note": "Xona ta’mirlanmoqda" }
+              reopen — ochilish sanasi (KK.OO.YYYY yoki YYYY-OO-KK); sana noma’lum bo‘lsa — "" (kartochkada «Vaqtincha yopiq» ko‘rinadi);
+              note — mijozlar uchun izoh (majburiy emas, "" bo‘lishi mumkin).
+              Yopiq ofis ro‘yxatda doim qoladi: uni «Hozir ochiq» va «Yakshanba kuni ishlaydi» tugmalari yashirmaydi
+              (viloyat va qidiruv odatdagidek ishlaydi). reopen’da ko‘rsatilgan kuni ofis o‘zi odatdagi tartibga qaytadi.
+
+  JSON qoidalari: barcha matnlar qo‘sh tirnoq "…" ichida; har bir maydon va blokdan keyin vergul, ro‘yxatdagi OXIRGISIDAN tashqari;
+  matn ichida qo‘sh tirnoq o‘rniga «ichki tirnoq»dan foydalaning. Xato qilsangiz, sahifada xato tavsifi bilan xabar chiqadi.
+  Tekshirish: sahifani manzilda #debug bilan oching — filtrlar paneli ostida ma’lumotlardagi barcha topilgan muammolar ro‘yxati chiqadi.
+-->
+<script type="application/json" id="mbz-data">
+[
+  {
+    "active": true,
+    "name": "1-sonli xizmat ko‘rsatish markazi — Oloy",
+    "region": "Toshkent",
+    "address": "Yunusobod tumani, Amir Temur shoh ko‘chasi, 24",
+    "landmark": "",
+    "uzkad": "1726266052",
+    "map": "https://yandex.uz/maps/-/CTELbSKL",
+    "schedule": [
+      { "days": "du-ya", "hours": "08:00-20:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "2-sonli xizmat ko‘rsatish markazi — Labzak",
+    "region": "Toshkent",
+    "address": "Shayxontohur tumani, Labzak ko‘chasi, 1a",
+    "landmark": "",
+    "uzkad": "1726277023",
+    "map": "https://yandex.uz/maps/-/CTELb-Im",
+    "closed": { "reopen": "15.11.2026", "note": "" },
+    "schedule": [
+      { "days": "du-ya", "hours": "08:00-20:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Tashkent City Mall savdo markazi",
+    "region": "Toshkent",
+    "address": "Shayxontohur tumani, Olmazor MFY, Batir Zokirov ko‘chasi, 7",
+    "landmark": "Tashkent City Mall savdo markazi",
+    "uzkad": "1726277022",
+    "map": "https://yandex.uz/maps/-/CTELfS1z",
+    "closed": { "reopen": "", "note": "" },
+    "schedule": [
+      { "days": "du-pa", "hours": "10:00-23:00", "lunch": "" },
+      { "days": "ju-ya", "hours": "10:00-24:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Samarqand Darvoza savdo markazi",
+    "region": "Toshkent",
+    "address": "Shayxontohur tumani, Qoratosh ko‘chasi, 5A",
+    "landmark": "Samarqand Darvoza savdo markazi",
+    "uzkad": "1726277045",
+    "map": "https://yandex.uz/maps/-/CTAuAP8S",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-22:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Mega Planet savdo markazi",
+    "region": "Toshkent",
+    "address": "Yunusobod tumani, 11-kvartal, Ahmad Donish ko‘chasi, 2B",
+    "landmark": "Mega Planet savdo markazi, 1-qavat",
+    "uzkad": "1726266003",
+    "map": "https://yandex.uz/maps/-/CTAuEBI7",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-19:00", "lunch": "14:00-15:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Mirzo Ulug‘bek tumani",
+    "region": "Toshkent",
+    "address": "Mirzo Ulug‘bek tumani, M. Yusuf ko‘chasi, 68-uy, 62-xonadon",
+    "landmark": "Buyuk Ipak Yo‘li metro bekati",
+    "uzkad": "1726269045",
+    "map": "https://yandex.uz/maps/-/CXB64E3~",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-19:00", "lunch": "14:00-15:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Chilonzor metrosi",
+    "region": "Toshkent",
+    "address": "Chilonzor tumani, 16-kvartal, 15-uy, 65-xonadon",
+    "landmark": "Chilonzor metrosi, savdo qatorlari",
+    "uzkad": "1726294043",
+    "map": "https://yandex.uz/maps/-/CTAu4O-9",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-21:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Oliygohlar shaharchasi",
+    "region": "Toshkent",
+    "address": "Olmazor tumani, Talabalar ko‘chasi, 2",
+    "landmark": "Oliygohlar shaharchasi",
+    "uzkad": "1726280051",
+    "map": "https://yandex.uz/maps/-/CTAue-KP",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-19:00", "lunch": "14:00-15:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Compass savdo markazi",
+    "region": "Toshkent",
+    "address": "Bektemir tumani, TKAD, 17-uy",
+    "landmark": "Compass savdo markazi, Quyliq bozori",
+    "uzkad": "1726273039",
+    "map": "https://yandex.uz/maps/-/CTAumTjV",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-22:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Universam bozori",
+    "region": "Toshkent",
+    "address": "Yunusobod tumani, Amir Temur va Ahmad Donish ko‘chalari kesishmasi, savdo qatori",
+    "landmark": "Universam bozoridagi bekat",
+    "uzkad": "1726266049",
+    "map": "https://yandex.uz/maps/-/CTAu6FL~",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-22:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Sergeli tumani",
+    "region": "Toshkent",
+    "address": "Sergeli tumani, Mehrigiyo MFY, 6-kvartal, 49a-uy",
+    "landmark": "Sergeli dehqon bozori",
+    "uzkad": "1726283003",
+    "map": "https://yandex.uz/maps/-/CTAunZOd",
+    "schedule": [
+      { "days": "du-ya", "hours": "10:00-19:00", "lunch": "14:00-15:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Andijon — Paytug‘",
+    "region": "Andijon viloyati",
+    "address": "Izboskan tumani, Alisher Navoiy MFY, Naqshbandiy ko‘chasi, 155",
+    "landmark": "",
+    "uzkad": "",
+    "map": "",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Andijon — Eski shahar",
+    "region": "Andijon viloyati",
+    "address": "Andijon sh., Mustaqillik shoh ko‘chasi (sobiq Oltinko‘l ko‘chasi), 5a",
+    "landmark": "Eski shahar hududi, «ZAM-ZAM Med Servis» tibbiy markazi yonida",
+    "uzkad": "1703401009",
+    "map": "https://yandex.uz/maps/-/CTAurCmT",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Qo‘rg‘ontepa",
+    "region": "Andijon viloyati",
+    "address": "Qo‘rg‘ontepa tumani, Qo‘rg‘ontepa sh., Shahrixonsoy MFY, Shifokor ko‘chasi, 71",
+    "landmark": "",
+    "uzkad": "1703220071",
+    "map": "https://yandex.uz/maps/-/CTAuv65h",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Andijon — Boburshoh ko‘chasi",
+    "region": "Andijon viloyati",
+    "address": "Andijon sh., Boburshoh ko‘chasi, 13v",
+    "landmark": "«Iris» kafesi yonida",
+    "uzkad": "1703401042",
+    "map": "https://yandex.uz/maps/-/CTAuvH-X",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Andijon — Toshkent ko‘chasi",
+    "region": "Andijon viloyati",
+    "address": "Andijon sh., Toshkent ko‘chasi (sobiq Semashko ko‘chasi), 3",
+    "landmark": "«Ruboiy» kafesi yonida",
+    "uzkad": "1703401077",
+    "map": "https://yandex.uz/maps/-/CTAuzZLm",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-19:00", "lunch": "" },
+      { "days": "sh", "hours": "09:00-18:00", "lunch": "13:00-14:00" },
+      { "days": "ya", "hours": "dam olish", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Asaka",
+    "region": "Andijon viloyati",
+    "address": "Asaka sh., Umid ko‘chasi",
+    "landmark": "Yer osti o‘tish joyi va «Gulnora Farm» dorixonasi yonida",
+    "uzkad": "1703224019",
+    "map": "https://yandex.uz/maps/-/CXB64Pys",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Bo‘loqboshi",
+    "region": "Andijon viloyati",
+    "address": "Bo‘loqboshi tumani, Bo‘loqboshi, M. Ismoiliy MFY, Mirzo Kalom Ismoiliy ko‘chasi, 17",
+    "landmark": "«03» dorixonasi yonida, madaniyat va istirohat bog‘i qarshisida",
+    "uzkad": "1703210004",
+    "map": "https://yandex.uz/maps/-/CTAyIRPZ",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Buxoro — Xizmat ko‘rsatish markazi",
+    "region": "Buxoro viloyati",
+    "address": "Buxoro sh., Hofiz Tanish Buxoriy ko‘chasi, 10",
+    "landmark": "",
+    "uzkad": "1706401024",
+    "map": "https://goo.gl/maps/fKvBF7UvEDkEFBab9",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Buxoro — Dehqon bozori",
+    "region": "Buxoro viloyati",
+    "address": "Buxoro sh., Ibn Sino ko‘chasi, 1",
+    "landmark": "Dehqon bozori (avtoturargoh)",
+    "uzkad": "1706401016",
+    "map": "https://maps.app.goo.gl/t1TdrN495QDSVKam6",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "G‘ijduvon",
+    "region": "Buxoro viloyati",
+    "address": "G‘ijduvon sh., Yu. Hamadoniy ko‘chasi",
+    "landmark": "",
+    "uzkad": "1706215068",
+    "map": "https://goo.gl/maps/KohzCFgzJ3Yq2pD39",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Guliston",
+    "region": "Sirdaryo viloyati",
+    "address": "Guliston sh., Birlashgan ko‘chasi, 68",
+    "landmark": "",
+    "uzkad": "1724401014",
+    "map": "https://yandex.uz/maps/-/CTAyjW4g",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Jizzax — Xizmat ko‘rsatish markazi",
+    "region": "Jizzax viloyati",
+    "address": "Jizzax sh., Sayilijoy mahallasi, Sh. Rashidov shoh ko‘chasi",
+    "landmark": "",
+    "uzkad": "1708401028",
+    "map": "https://yandex.uz/maps/-/CTAyrQKX",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Jizzax — «Zebo» savdo markazi",
+    "region": "Jizzax viloyati",
+    "address": "Jizzax sh., Sh. Rashidov shoh ko‘chasi",
+    "landmark": "«Zebo» savdo markazi hududi",
+    "uzkad": "1708401031",
+    "map": "https://goo.gl/maps/4qmHp6fNeh479rnFA",
+    "schedule": [
+      { "days": "du-sh", "hours": "09:00-19:00", "lunch": "" },
+      { "days": "ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Qarshi — Xizmat ko‘rsatish markazi",
+    "region": "Qashqadaryo viloyati",
+    "address": "Qarshi sh., Islom Karimov ko‘chasi, 221",
+    "landmark": "",
+    "uzkad": "",
+    "map": "https://yandex.uz/maps/-/CTAyzVpD",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Qarshi — Islom Karimov ko‘chasi",
+    "region": "Qashqadaryo viloyati",
+    "address": "Qarshi sh., Islom Karimov ko‘chasi, 254",
+    "landmark": "",
+    "uzkad": "",
+    "map": "https://yandex.uz/maps/-/CTAy7Jmq",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Koson",
+    "region": "Qashqadaryo viloyati",
+    "address": "Koson tumani, Koson, Saripul MFY, Mustaqillik shoh ko‘chasi, 14",
+    "landmark": "Koson dehqon bozori",
+    "uzkad": "",
+    "map": "https://yandex.ru/maps/org/mobiuz_koson/27673959519",
+    "schedule": [
+      { "days": "du-ju", "hours": "09:00-18:00", "lunch": "13:00-14:00" },
+      { "days": "sh-ya", "hours": "dam olish", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Shahrisabz — Xizmat ko‘rsatish markazi",
+    "region": "Qashqadaryo viloyati",
+    "address": "Kitob sh., Buyuk Ipak Yo‘li ko‘chasi, 1",
+    "landmark": "",
+    "uzkad": "1710232057",
+    "map": "https://yandex.uz/maps/-/CTA5AV5v",
+    "schedule": [
+      { "days": "du-sh", "hours": "08:00-18:00", "lunch": "13:00-14:00" },
+      { "days": "ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Shahrisabz — «Makro» supermarketi",
+    "region": "Qashqadaryo viloyati",
+    "address": "Shahrisabz sh., «Xabarlik» MFY, Ipak Yo‘li ko‘chasi",
+    "landmark": "«Makro» supermarketi binosida",
+    "uzkad": "1710405009",
+    "map": "https://goo.gl/maps/gLczU7JsqvtXCV9Y7",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-19:00", "lunch": "13:00-14:00" },
+      { "days": "sh-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Navoiy — Xizmat ko‘rsatish markazi",
+    "region": "Navoiy viloyati",
+    "address": "Navoiy sh., Navoiy ko‘chasi, 11",
+    "landmark": "",
+    "uzkad": "",
+    "map": "https://goo.gl/maps/vwgZmpEJcEehcK2A8",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Zarafshon",
+    "region": "Navoiy viloyati",
+    "address": "Zarafshon sh., A. Temur ko‘chasi, 45",
+    "landmark": "Navoiy shahridagi xizmat ko‘rsatish markazi bo‘limi",
+    "uzkad": "1712408014",
+    "map": "https://yandex.uz/maps/-/CTA5mVLb",
+    "schedule": [
+      { "days": "du-ju", "hours": "09:00-18:00", "lunch": "13:00-14:00" },
+      { "days": "sh-ya", "hours": "dam olish", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Navoiy — Dehqon bozori",
+    "region": "Navoiy viloyati",
+    "address": "Navoiy sh., Me’mor MFY, 17-kvartal, G‘alaba ko‘chasi, 10",
+    "landmark": "",
+    "uzkad": "1712401022",
+    "map": "https://yandex.uz/maps/-/CTA5q6Ys",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Namangan",
+    "region": "Namangan viloyati",
+    "address": "Namangan sh., Nodira ko‘chasi, 1",
+    "landmark": "",
+    "uzkad": "1714401019",
+    "map": "https://yandex.uz/maps/-/CTA5uE05",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-19:00", "lunch": "" },
+      { "days": "sh", "hours": "09:00-18:00", "lunch": "" },
+      { "days": "ya", "hours": "09:00-18:00", "lunch": "12:00-13:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Nukus",
+    "region": "Qoraqalpog‘iston",
+    "address": "Nukus sh., To‘rtko‘l shossesi, 138a",
+    "landmark": "",
+    "uzkad": "1735401051",
+    "map": "https://yandex.uz/maps/-/CTETr82E",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Samarqand — Xizmat ko‘rsatish markazi",
+    "region": "Samarqand viloyati",
+    "address": "Samarqand sh., Mirzo Ulug‘bek ko‘chasi, 105",
+    "landmark": "",
+    "uzkad": "1718401124",
+    "map": "https://yandex.uz/maps/-/CTA5y-J7",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-20:00", "lunch": "" },
+      { "days": "sh-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Samarqand — Pochta ko‘chasi",
+    "region": "Samarqand viloyati",
+    "address": "Samarqand sh., Pochta ko‘chasi, 5",
+    "landmark": "",
+    "uzkad": "1718401023",
+    "map": "https://yandex.uz/maps/-/CTA5FM1G",
+    "schedule": [
+      { "days": "du-ju", "hours": "09:00-17:00", "lunch": "13:00-14:00" },
+      { "days": "sh", "hours": "09:00-15:00", "lunch": "13:00-14:00" },
+      { "days": "ya", "hours": "dam olish", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Termiz",
+    "region": "Surxondaryo viloyati",
+    "address": "Termiz sh., Navbahor ko‘chasi, 12A",
+    "landmark": "",
+    "uzkad": "1722401030",
+    "map": "https://yandex.uz/maps/-/CTA5JKLi",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-19:00", "lunch": "" },
+      { "days": "sh-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Denov",
+    "region": "Surxondaryo viloyati",
+    "address": "Denov sh., Sh. Rashidov ko‘chasi, 238a",
+    "landmark": "Termiz shahridagi xizmat ko‘rsatish markazi bo‘limi",
+    "uzkad": "1722210036",
+    "map": "https://yandex.uz/maps/-/CTEPrGop",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-19:00", "lunch": "" },
+      { "days": "sh-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Urganch",
+    "region": "Xorazm viloyati",
+    "address": "Urganch sh., Al-Xorazmiy ko‘chasi, 101",
+    "landmark": "",
+    "uzkad": "1733401033",
+    "map": "https://yandex.uz/maps/-/CTEPvYOM",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Farg‘ona",
+    "region": "Farg‘ona viloyati",
+    "address": "Farg‘ona sh., Sayilgoh ko‘chasi, 26",
+    "landmark": "",
+    "uzkad": "1730401055",
+    "map": "https://yandex.uz/maps/-/CTEPvW9e",
+    "schedule": [
+      { "days": "du-ju", "hours": "08:00-18:00", "lunch": "" },
+      { "days": "sh", "hours": "09:00-18:00", "lunch": "" },
+      { "days": "ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Marg‘ilon — Dehqon bozori",
+    "region": "Farg‘ona viloyati",
+    "address": "Marg‘ilon sh., B. Marg‘inoniy ko‘chasi, 184-b",
+    "landmark": "",
+    "uzkad": "",
+    "map": "https://yandex.uz/maps/-/CTEPzI5y",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Qo‘qon",
+    "region": "Farg‘ona viloyati",
+    "address": "Qo‘qon sh., Bog‘iston ko‘chasi, 6a",
+    "landmark": "Farg‘ona shahridagi xizmat ko‘rsatish markazi bo‘limi",
+    "uzkad": "1730405057",
+    "map": "https://yandex.uz/maps/-/CTEP7NIC",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Chirchiq",
+    "region": "Toshkent viloyati",
+    "address": "Chirchiq sh., Alisher Navoiy shoh ko‘chasi, 13",
+    "landmark": "",
+    "uzkad": "1727419007",
+    "map": "https://yandex.uz/maps/-/CTEP702M",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Bekobod",
+    "region": "Toshkent viloyati",
+    "address": "Bekobod sh., O‘zbekiston MFY, Sirdaryo ko‘chasi, 630",
+    "landmark": "Bekobod shahridagi dehqon bozori",
+    "uzkad": "",
+    "map": "",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "13:00-14:00" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Olmaliq",
+    "region": "Toshkent viloyati",
+    "address": "Olmaliq sh., Olimpiya ko‘chasi, 3",
+    "landmark": "",
+    "uzkad": "1727404009",
+    "map": "https://yandex.uz/maps/-/CTETA-L-",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Angren",
+    "region": "Toshkent viloyati",
+    "address": "Angren sh., Alisher Navoiy ko‘chasi",
+    "landmark": "Korzinka supermarketi qarshisida",
+    "uzkad": "1727407046",
+    "map": "https://maps.google.com/maps?q=41.017257,70.081028&ll=41.017257,70.081028&z=16",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Yangiyo‘l",
+    "region": "Toshkent viloyati",
+    "address": "Yangiyo‘l sh., Yoshlik ko‘chasi, 2",
+    "landmark": "",
+    "uzkad": "1727424018",
+    "map": "https://yandex.uz/maps/-/CTETQKmZ",
+    "schedule": [
+      { "days": "du-ya", "hours": "08:00-18:00", "lunch": "" }
+    ]
+  },
+  {
+    "active": true,
+    "name": "Chinoz",
+    "region": "Toshkent viloyati",
+    "address": "Chinoz tumani, Qazi MFY, Samarqand ko‘chasi, 88",
+    "landmark": "",
+    "uzkad": "1727256039",
+    "map": "https://yandex.uz/maps/-/CTETUMKr",
+    "schedule": [
+      { "days": "du-ya", "hours": "09:00-18:00", "lunch": "" }
+    ]
+  }
+]
+</script>
+
+<!-- ============================ 4. SKRIPT ============================ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Yordamchi funksiyalar ---------- */
+  var DAYS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
+  var DAYS_FULL = ['dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba', 'yakshanba'];
+  var TZ = 'Asia/Tashkent';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var norm = function (s) { return String(s).toLowerCase().replace(/ё/g, 'е').replace(/[«»"“”'‘’ʻʼ`]/g, ''); };
+
+  function now() {
+    var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+    var g = function (t) { return p.filter(function (x) { return x.type === t; })[0].value; };
+    return { d: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(g('weekday')), t: (+g('hour')) * 60 + (+g('minute')), date: g('year') + '-' + g('month') + '-' + g('day') };
+  }
+  function span(s) { var a = s.split('-'); return [toMin(a[0]), toMin(a[1])]; }
+  function toMin(s) { var a = s.split(':'); return (+a[0]) * 60 + (+a[1]); }
+  function fmt(m) { var h = Math.floor(m / 60), mm = m % 60; return (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm; }
+  function lunchOf(o, d) { return Array.isArray(o.l) ? o.l[d] : (o.l || null); }
+  function range(s) { return s.replace('-', '–'); }
+
+  var MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+  function dateUz(iso, n) {
+    var p = iso.split('-'), y = +p[0];
+    return (y !== +n.date.slice(0, 4) ? y + '-yil ' : '') + (+p[2]) + '-' + MONTHS[+p[1] - 1];
+  }
+  // vaqtincha yopilish: null — ofis ishlayapti (closed maydoni yo‘q yoki ochilish sanasi allaqachon kelgan)
+  function closure(o, n) {
+    if (!o.cl) return null;
+    if (o.cl.reopen && n.date >= o.cl.reopen) return null;
+    return o.cl;
+  }
+
+  function status(o, n) {
+    if (!o.ok) return { k: 'unknown', pill: '', note: '' };
+    var day = o.w[n.d];
+    if (day) {
+      var s = span(day), lu = lunchOf(o, n.d), ls = lu ? span(lu) : null;
+      if (n.t >= s[0] && n.t < s[1]) {
+        if (ls && n.t >= ls[0] && n.t < ls[1]) return { k: 'lunch', pill: 'Tanaffus', note: 'Hozir tanaffus, ' + fmt(ls[1]) + ' gacha' };
+        return { k: 'open', pill: 'Ochiq', note: 'Hozir ochiq, ' + fmt(s[1]) + ' gacha' };
+      }
+      if (n.t < s[0]) return { k: 'closed', pill: 'Yopiq', note: 'Hozir yopiq · soat ' + fmt(s[0]) + ' da ochiladi' };
+    }
+    for (var i = 1; i <= 7; i++) {
+      var d = (n.d + i) % 7;
+      if (o.w[d]) return { k: 'closed', pill: 'Yopiq', note: 'Hozir yopiq · ' + (i === 1 ? 'ertaga' : DAYS_FULL[d] + ' kuni') + ' soat ' + fmt(span(o.w[d])[0]) + ' da ochiladi' };
+    }
+    return { k: 'closed', pill: 'Yopiq', note: 'Hozir yopiq' };
+  }
+
+  function groups(o) {
+    var out = [];
+    for (var d = 0; d < 7; d++) {
+      var key = (o.w[d] || 'off') + '|' + (lunchOf(o, d) || '');
+      var last = out[out.length - 1];
+      if (last && last.key === key) last.to = d;
+      else out.push({ key: key, from: d, to: d, h: o.w[d], l: lunchOf(o, d) });
+    }
+    return out;
+  }
+
+  /* ---------- <script id="mbz-data"> dan ma’lumotlarni yuklash va tekshirish ---------- */
+  var TSH = 'Toshkent';
+  var DAYS_LOW = ['du', 'se', 'ch', 'pa', 'ju', 'sh', 'ya'];
+  var problems = [], D = [], fatal = '';
+
+  function parseDays(str) {
+    var out = [], t = String(str || '').toLowerCase().replace(/[–—−]/g, '-').replace(/\s+/g, '');
+    if (t === 'harkuni') t = 'du-ya';
+    t.split(',').forEach(function (part) {
+      if (!part) return;
+      var m = part.split('-'), a = DAYS_LOW.indexOf(m[0]), b = m.length > 1 ? DAYS_LOW.indexOf(m[1]) : a;
+      if (a < 0 || b < 0 || m.length > 2) throw new Error('noma’lum kunlar «' + str + '» (bunday yozing: du-ju, sh, ya)');
+      for (var d = a; ; d = (d + 1) % 7) { out.push(d); if (d === b) break; }
+    });
+    return out;
+  }
+  function parseHours(str) {
+    var t = String(str == null ? '' : str).toLowerCase().replace(/[–—−]/g, '-').replace(/\s+/g, '');
+    if (!t || t === 'damolish' || t === 'damolishkuni' || t === 'yo‘q' || t === '-') return null;
+    var m = /^(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})$/.exec(t);
+    if (!m) throw new Error('vaqt «' + str + '» bunday yoziladi: 09:00-18:00');
+    var a = (+m[1]) * 60 + (+m[2]), b = (+m[3]) * 60 + (+m[4]);
+    if (a >= b || b > 1440 || +m[2] > 59 || +m[4] > 59) throw new Error('noto‘g‘ri vaqt «' + str + '»');
+    return fmt(a) + '-' + fmt(b);
+  }
+  function build(r, i) {
+    var s = function (v) { return v == null ? '' : String(v).trim(); };
+    var o = { id: i + 1, n: s(r.name), r: s(r.region), a: s(r.address), lm: s(r.landmark), k: s(r.uzkad), map: s(r.map),
+              w: [null, null, null, null, null, null, null], l: [null, null, null, null, null, null, null], ok: true };
+    var tag = '«' + (o.n || '№' + (i + 1) + '-ofis') + '»';
+    if (!o.n || !o.r || !o.a) problems.push(tag + ': name, region va address maydonlarini to‘ldiring');
+    if (r.closed) {
+      var cl = r.closed === true ? {} : r.closed, re = s(cl.reopen), iso = '';
+      if (re) {
+        var m1 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(re), m2 = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(re);
+        if (m1) iso = re;
+        else if (m2) iso = m2[3] + '-' + ('0' + m2[2]).slice(-2) + '-' + ('0' + m2[1]).slice(-2);
+        else problems.push(tag + ': ochilish sanasi (reopen) bunday yoziladi: 15.11.2026');
+      }
+      o.cl = { reopen: iso, note: s(cl.note) };
+    }
+    try {
+      if (!Array.isArray(r.schedule) || !r.schedule.length) throw new Error('ish tartibi (schedule) to‘ldirilmagan');
+      r.schedule.forEach(function (g) {
+        var h = parseHours(g.hours), lu = g.lunch ? parseHours(g.lunch) : null;
+        parseDays(g.days).forEach(function (d) { o.w[d] = h; o.l[d] = h ? lu : null; });
+      });
+    } catch (e) { problems.push(tag + ': ' + e.message); o.ok = false; }
+    return o;
+  }
+  (function () {
+    try {
+      var raw = JSON.parse($('mbz-data').textContent);
+      if (!Array.isArray(raw)) throw new Error('ma’lumotlar ro‘yxat bo‘lishi kerak [ … ]');
+      raw.forEach(function (r, i) { if (r && r.active !== false) D.push(build(r, i)); });
+    } catch (e) { fatal = e.message; }
+  })();
+  if (fatal) {
+    $('mbz-list').innerHTML = '<div class="mbz__error"><b>Ofislar ma’lumotlarida (JSON) xato.</b><br>' + esc(fatal) + '<br><code>mbz-data</code> blokidagi vergul va tirnoqlarni tekshiring.</div>';
+    $('mbz-count').textContent = '';
+    return;
+  }
+  if (problems.length) {
+    if (window.console) console.warn('Mobiuz offices: ' + problems.join(' | '));
+    if (/debug/.test(location.search + location.hash)) {
+      var box = document.createElement('div');
+      box.className = 'mbz__error';
+      box.innerHTML = '<b>Ma’lumotlarda muammolar topildi:</b><br>' + problems.map(esc).join('<br>');
+      $('mbz-list').parentNode.insertBefore(box, $('mbz-list'));
+    }
+  }
+
+  /* ---------- Holat ---------- */
+  var state = { q: '', region: 'all', open: false, sun: false };
+  var regions = [];
+  D.forEach(function (o) { if (regions.indexOf(o.r) < 0) regions.push(o.r); });
+  // viloyatlar tartibi: Toshkent, Toshkent viloyati, keyin qolganlari alifbo bo‘yicha
+  var REGION_FIRST = ['Toshkent', 'Toshkent viloyati'];
+  regions.sort(function (a, b) {
+    var ia = REGION_FIRST.indexOf(a), ib = REGION_FIRST.indexOf(b);
+    if (ia >= 0 || ib >= 0) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    return a.localeCompare(b, 'uz');
+  });
+  D.forEach(function (o) { o.hay = norm([o.n, o.r, o.a, o.lm, o.k].join(' ')); });
+
+  function readHash() {
+    try {
+      var p = new URLSearchParams(location.hash.replace(/^#/, ''));
+      if (p.get('q')) state.q = p.get('q');
+      if (p.get('region') && regions.indexOf(p.get('region')) >= 0) state.region = p.get('region');
+      state.open = p.get('open') === '1';
+      state.sun = p.get('sun') === '1';
+    } catch (e) {}
+  }
+  function writeHash() {
+    try {
+      var p = new URLSearchParams();
+      if (state.q) p.set('q', state.q);
+      if (state.region !== 'all') p.set('region', state.region);
+      if (state.open) p.set('open', '1');
+      if (state.sun) p.set('sun', '1');
+      var s = p.toString();
+      history.replaceState(null, '', location.pathname + location.search + (s ? '#' + s : ''));
+    } catch (e) {}
+  }
+  function isDefault() { return !state.q && state.region === 'all' && !state.open && !state.sun; }
+
+  /* ---------- Ikonkalar ---------- */
+  var I = {
+    pin: '<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    pause: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg>',
+    route: '<svg viewBox="0 0 24 24"><path d="M3 11 21 3l-8 18-2-8-8-2z"/></svg>'
+  };
+
+  /* ---------- Chizish (render) ---------- */
+  function card(o, n) {
+    var st = status(o, n), day = o.w[n.d], lu = lunchOf(o, n.d);
+    var today = !o.ok ? 'Ish tartibi aniqlanmoqda' : day ? 'Bugun ' + range(day) + (lu ? ' · tanaffus ' + range(lu) : '') : 'Bugun dam olish kuni';
+    var cl = closure(o, n);
+    var q = o.map || ((o.r === TSH ? 'Toshkent sh.' : o.r) + ', ' + o.a);
+    var href = /^https?:\/\//i.test(q) ? q : 'https://yandex.com/maps/?text=' + encodeURIComponent(q);
+    var sched = groups(o).map(function (g) {
+      var label = g.from === g.to ? DAYS[g.from] : DAYS[g.from] + '–' + DAYS[g.to];
+      var val = g.h ? '<b class="mbz-h">' + range(g.h) + '</b>' + (g.l ? ' <i class="mbz-l">· tanaffus ' + range(g.l) + '</i>' : '') : 'Dam olish kuni';
+      var act = n.d >= g.from && n.d <= g.to ? ' class="is-today"' : '';
+      return '<li' + act + '><span>' + label + '</span><span>' + val + '</span></li>';
+    }).join('');
+    var banner = cl ? '<div class="mbz-closed' + (cl.reopen ? ' mbz-closed--date' : '') + '">' + I.pause + '<div><b>' + (cl.reopen ? esc(dateUz(cl.reopen, n)) + 'gacha vaqtincha yopiq' : 'Vaqtincha yopiq') + '</b>' +
+        (cl.note ? '<span class="mbz-closed__n">' + esc(cl.note) + '</span>' : '') + '</div></div>' : '';
+    return '<article class="mbz-card' + (cl ? ' mbz-card--closed' : '') + '" data-id="' + o.id + '">' +
+      '<h3 class="mbz-card__name">' + esc(o.n) + '</h3>' +
+      '<div class="mbz-line">' + I.pin + '<div>' + esc(o.a) + (o.k ? (/[.!?]$/.test(o.a) ? ' ' : '. ') + '<span class="mbz-code">UzKad kodi <b>' + esc(o.k) + '</b></span>' : '') + (o.lm ? '<em>' + esc(o.lm) + '</em>' : '') + '</div></div>' +
+      (cl ? banner : '') +
+      (cl ? '' : '<div class="mbz-line">' + I.clock + '<div><b>' + esc(today) + '</b>' + (st.note ? '<em class="mbz-st mbz-st--' + st.k + '">' + esc(st.note) + '</em>' : '') + '</div></div>') +
+      (o.ok ? '<div class="mbz-sched"><div class="mbz-sched__t">' + (cl ? 'Odatdagi ish tartibi' : 'Haftalik ish jadvali') + '</div><ul>' + sched + '</ul></div>' : '') +
+      '<div class="mbz-actions">' +
+        '<a class="mbz-btn mbz-btn--main" target="_blank" rel="noopener" href="' + esc(href) + '">' + I.route + 'Lokatsiya</a>' +
+      '</div></article>';
+  }
+
+  function match(o, n, tokens) {
+    if (state.region !== 'all' && o.r !== state.region) return false;
+    if (!closure(o, n)) {   // vaqtincha yopiq ofislar tugmalar bilan filtrlanmaydi — foydalanuvchi ularni doim ko‘rishi kerak
+      if (state.sun && !o.w[6]) return false;
+      if (state.open && status(o, n).k !== 'open') return false;
+    }
+    for (var i = 0; i < tokens.length; i++) if (o.hay.indexOf(tokens[i]) < 0) return false;
+    return true;
+  }
+
+  function renderSelects() {
+    $('mbz-region').innerHTML = '<option value="all">Barcha viloyatlar</option>' +
+      regions.map(function (r) { return '<option value="' + esc(r) + '">' + esc(r) + '</option>'; }).join('');
+    $('mbz-region').value = state.region;
+  }
+
+  function sync() {
+    $('mbz-q').value = state.q;
+    $('mbz-clear').classList.toggle('is-on', !!state.q);
+    $('mbz-region').value = state.region;
+    $('mbz-open').setAttribute('aria-pressed', state.open);
+    $('mbz-sun').setAttribute('aria-pressed', state.sun);
+  }
+
+  function render() {
+    var n = now(), tokens = norm(state.q).split(/\s+/).filter(Boolean);
+    var list = D.filter(function (o) { return match(o, n, tokens); });
+    var box = $('mbz-list');
+    if (isDefault()) {
+      // filtrsiz — kartochkalar viloyatlar bo‘yicha guruhlangan, har bir guruhda H2 sarlavha
+      box.className = 'mbz__groups';
+      box.innerHTML = regions.map(function (r) {
+        var items = list.filter(function (o) { return o.r === r; });
+        if (!items.length) return '';
+        return '<section class="mbz-group"><h2 class="mbz-group__t">' + esc(r) + ' <small>' + items.length + '</small></h2>' +
+               '<div class="mbz__grid">' + items.map(function (o) { return card(o, n); }).join('') + '</div></section>';
+      }).join('');
+    } else {
+      // filtr yoki qidiruv bilan — bitta umumiy natijalar ro‘yxati
+      box.className = 'mbz__grid';
+      box.innerHTML = list.map(function (o) { return card(o, n); }).join('');
+    }
+    $('mbz-empty').hidden = list.length > 0;
+    $('mbz-count').textContent = 'Ko‘rsatilmoqda: ' + list.length + ' ta, jami: ' + D.length + ' ta';
+    $('mbz-reset').hidden = isDefault();
+    sync();
+  }
+
+  function update() { writeHash(); render(); }
+  function reset() { state = { q: '', region: 'all', open: false, sun: false }; update(); }
+
+  /* ---------- Hodisalar ---------- */
+  var timer;
+  $('mbz-q').addEventListener('input', function (e) { clearTimeout(timer); var v = e.target.value; timer = setTimeout(function () { state.q = v.trim(); update(); }, 150); });
+  $('mbz-clear').addEventListener('click', function () { state.q = ''; update(); $('mbz-q').focus(); });
+  $('mbz-region').addEventListener('change', function (e) { state.region = e.target.value; update(); });
+  $('mbz-open').addEventListener('click', function () { state.open = !state.open; update(); });
+  $('mbz-sun').addEventListener('click', function () { state.sun = !state.sun; update(); });
+  $('mbz-reset').addEventListener('click', reset);
+  $('mbz-reset2').addEventListener('click', reset);
+
+  /* ---------- Boshlash ---------- */
+  readHash(); renderSelects(); render();
+  setInterval(render, 60000); // «Ochiq/Yopiq» holatlari har daqiqada yangilanadi
+})();
+</script>
+</body>
+</html>
